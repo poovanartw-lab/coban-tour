@@ -83,6 +83,7 @@ main{padding:20px 22px 48px;min-width:0}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
 .box{border:1px solid var(--line);background:var(--card);padding:14px;position:relative;border-radius:var(--r);box-shadow:var(--shadow)}
 .box.show{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;border-color:var(--sun2)}
+.box .artist{font-size:24px;font-weight:700;line-height:1.15;margin:2px 0 4px;letter-spacing:.01em}
 .box.reh{background:linear-gradient(135deg,var(--reh),var(--reh2));color:#fff;border-color:var(--reh2)}.box.reh .sub,.box.reh a{color:#d6ebf2}
 .cd .ev.reh{background:var(--reh)}
 .box.show .sub,.box.show a{color:#ffe7d8}
@@ -357,7 +358,7 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const store = { get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}, del(k){try{localStorage.removeItem(k)}catch(e){}} };
 
 const KEYS = {
-  Shows:["id","date","endDate","name","type","venue","city","address","map","setTime","setLen","others","contact","contactPhone","hotelId","status","notes","crew","loadIn","room","tgroups"],
+  Shows:["id","date","endDate","name","type","venue","city","address","map","setTime","setLen","others","contact","contactPhone","hotelId","status","notes","crew","loadIn","room","tgroups","artist"],
   Schedule:["showId","date","time","end","item","cat","who","loc","notes"],
   Travel:["id","showId","date","type","no","from","to","dep","arr","who","driver","driverPhone","pickup","ref","notes"],
   Hotels:["id","showId","name","address","phone","checkin","checkout","map","rooms","notes"],
@@ -372,7 +373,7 @@ const FIELDS = {
   Schedule:[["showId","งาน","show"],["date","วันที่","date"],["time","เวลา","time"],["end","ถึงเวลา","time"],["item","รายการ","text",1],["cat","ประเภท","sel:"+CATS.join(",")],["loc","สถานที่","text"],["who","ใครเกี่ยวข้อง","who",1],["notes","หมายเหตุ","text",1]],
   Travel:[["id","รหัส","auto:T"],["showId","งาน","show"],["date","วันที่","date"],["type","ประเภท","sel:Flight,Van,Car,Bus,Train,Boat"],["no","เลขไฟลต์ / ทะเบียนรถ","text",1],["from","จาก","text"],["to","ไป","text"],["dep","ออก","time"],["arr","ถึง","time"],["who","ใครไปเที่ยวนี้","who",1],["driver","คนขับ","text"],["driverPhone","เบอร์คนขับ","tel"],["pickup","จุดรับ","text",1],["ref","Booking ref","text"],["notes","หมายเหตุ","text"]],
   Hotels:[["id","รหัส","auto:H"],["showId","งาน","show"],["name","ชื่อโรงแรม","text",1],["address","ที่อยู่","text",1],["phone","เบอร์โรงแรม","tel"],["map","ลิงก์แผนที่","url"],["checkin","เช็กอิน","date"],["checkout","เช็กเอาต์","date"],["rooms","ห้อง / ใครพัก","text",1],["notes","หมายเหตุ","text",1]],
-  Shows:[["id","รหัส","auto:S"],["status","สถานะ","sel:Confirmed,TBC,Cancelled"],["date","วันที่","date"],["endDate","ถึงวันที่ (ถ้าหลายวัน)","date"],["name","ชื่องาน","text",1],["type","ประเภท","sel:Show,Rehearsal,Festival,Pub,Event,Private"],["venue","Venue","text"],["city","เมือง","text"],["address","ที่อยู่","text",1],["map","ลิงก์แผนที่","url",1],["setTime","เวลาขึ้นโชว์","time"],["setLen","ความยาว (นาที)","number"],["others","ศิลปินร่วมเวที","text",1],["contact","ผู้ติดต่อหน้างาน","text"],["contactPhone","เบอร์ผู้ติดต่อ","tel"],["hotelId","Hotel ID","text"],["loadIn","จุดโหลด / ที่จอดรถ","text",1],["room","ห้องพัก / Green room (ที่หน้างาน)","text",1],["tgroups","ทีมเดินทาง (เช่น ทีมรถตู้: ภู, กิต | ทีมบิน: น๊อต, ไผ่) · เว้นว่าง = ไปด้วยกันทั้งหมด","text",1],["notes","หมายเหตุ","text",1],["crew","ทีมที่ไปงานนี้ (ไม่เลือก = ทุกคน)","crew",1]]
+  Shows:[["id","รหัส","auto:S"],["status","สถานะ","sel:Confirmed,TBC,Cancelled"],["date","วันที่","date"],["endDate","ถึงวันที่ (ถ้าหลายวัน)","date"],["artist","ศิลปิน (เล่นให้ใคร / ทำงานให้ใคร) · กดเลือกหรือพิมพ์ชื่อใหม่","artist",1],["name","ชื่องาน","text",1],["type","ประเภท","sel:Show,Rehearsal,Festival,Pub,Event,Private"],["venue","Venue","text"],["city","เมือง","text"],["address","ที่อยู่","text",1],["map","ลิงก์แผนที่","url",1],["setTime","เวลาขึ้นโชว์","time"],["setLen","ความยาว (นาที)","number"],["others","ศิลปินร่วมเวที","text",1],["contact","ผู้ติดต่อหน้างาน","text"],["contactPhone","เบอร์ผู้ติดต่อ","tel"],["hotelId","Hotel ID","text"],["loadIn","จุดโหลด / ที่จอดรถ","text",1],["room","ห้องพัก / Green room (ที่หน้างาน)","text",1],["tgroups","ทีมเดินทาง (เช่น ทีมรถตู้: ภู, กิต | ทีมบิน: น๊อต, ไผ่) · เว้นว่าง = ไปด้วยกันทั้งหมด","text",1],["notes","หมายเหตุ","text",1],["crew","ทีมที่ไปงานนี้ (ไม่เลือก = ทุกคน)","crew",1]]
 };
 FIELDS.Setlist=[["showId","งาน","show"],["seq","ลำดับในลิสต์","number"],["no","เลขเพลง (ว่าง = ช่วงพูด/คั่น)","text"],["song","ชื่อเพลง / ช่วง","text",1],["key","คีย์","text"],["ver","เวอร์ชัน","text"],["notes","หมายเหตุ","text",1]];
 FIELDS.Crew=[["name","ชื่อ (ชื่อจริงหรือชื่อเล่น)","text",1],["short","ชื่อที่โชว์ในเว็บ","text"],["group","กลุ่ม","sel:Band,Crew,Management,Artist"],["role","หน้าที่หน้างาน (On-site, English)","text",1],["notes","หน้าที่หลังบ้าน (Back office, English)","text",1]];
@@ -459,6 +460,7 @@ const showsOn=s=>D.Shows.filter(x=>x.date===s||(x.endDate&&x.date<=s&&s<=x.endDa
 const travelOn=s=>D.Travel.filter(r=>r.date===s).sort((a,b)=>(mins(a.dep)??9999)-(mins(b.dep)??9999));
 const hotelFor=s=>D.Hotels.find(h=>h.checkin&&h.checkout&&h.checkin<=s&&s<h.checkout);
 const isReh=x=>x&&x.type==="Rehearsal";
+const artistOf=x=>{if(x.artist)return x.artist.trim();const m=/ศิลปิน\s*:?\s*([^·\n]+)/.exec(x.notes||"");if(m)return m[1].trim();const i=(x.name||"").search(/\s[–-]\s/);return i>0?x.name.slice(0,i).trim():""};
 function dayKind(s){const ss=showsOn(s),sh=ss.length,tr=travelOn(s).length,rh=sh&&ss.every(isReh);return sh&&tr?["both",rh?"Travel + Rehearsal":"Travel + Show"]:sh?(rh?["reh","Rehearsal"]:["show","Show"]):tr?["travel","Travel"]:["off","Off"]}
 const gq=(...a)=>encodeURIComponent(a.filter(Boolean).join(" "));
 const mapEmbed=(q)=>`<div class="mapbox"><iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=${q}&z=15&output=embed" title="แผนที่"></iframe></div>`;
@@ -546,7 +548,7 @@ function readHash(){const h=location.hash.slice(1);const m=/^d-(\d{4}-\d{2}-\d{2
 
 function renderSide(){const days=allDays();const t=todayISO();
   $("#side").innerHTML=days.map(s=>{const [k,l]=dayKind(s);const sh=showsOn(s);
-    const tr=travelOn(s);const sub=sh.length?sh.map(x=>x.venue||x.name).join(" / ")+(sh[0].city?" · "+sh[0].city:""):tr.length?tr[0].from+" → "+tr[tr.length-1].to:"";
+    const tr=travelOn(s);const sub=sh.length?sh.map(x=>[artistOf(x),x.venue||x.name].filter(Boolean).join(" @ ")).join(" / "):tr.length?tr[0].from+" → "+tr[tr.length-1].to:"";
     return `<button class="dayitem${s<t?" past":""}" type="button" data-day="${s}" aria-current="${s===DAY}"><span class="d">${fShort(s)}</span><span class="pill ${k}">${l}</span><span class="s">${esc(sub)}</span></button>`}).join("");
   const cur=$("#side [aria-current='true']");if(cur){const sd=$("#side");const a=cur.offsetLeft-sd.offsetLeft,b=cur.offsetTop-sd.offsetTop;if(a<sd.scrollLeft||a+cur.offsetWidth>sd.scrollLeft+sd.clientWidth)sd.scrollLeft=a-12;if(b<sd.scrollTop||b+cur.offsetHeight>sd.scrollTop+sd.clientHeight)sd.scrollTop=b-12}}
 
@@ -554,11 +556,11 @@ function renderDay(s){
   const groups=groupsForDay(s),cg=curGroup(groups);const vis=f=>matches(f)&&(!cg||forGroup(f,cg));
   const sh=showsOn(s),tr=travelOn(s).filter(r=>vis(r.who)),[,kl]=dayKind(s);
   const route=tr.length?`${tr[0].from} → ${tr[tr.length-1].to}`:"";
-  const title=sh.length?sh.map(x=>x.venue||x.name).join(" / "):route||"วันว่าง";
+  const title=sh.length?sh.map(x=>[artistOf(x),x.venue||x.name].filter(Boolean).join(" @ ")).join(" / "):route||"วันว่าง";
   const showId=sh[0]?.id||"";
   let L=`<h2 class="dtitle">${fShort(s)} <span class="t">· ${kl} day ·</span> ${esc(title)}</h2><div class="cols"><div class="stack">
     <div class="btnrow"><button class="btn" type="button" id="copyBtn">คัดลอกไป LINE</button><button class="btn dark" type="button" id="printBtn">พิมพ์ / PDF</button></div>`;
-  sh.forEach(x=>{L+=`<div class="box ${isReh(x)?"reh":"show"}"><div class="boxhead"><h3>${isReh(x)?"Rehearsal":"Show"}</h3>${edBtn("Shows",x)}</div><div class="big">${esc(x.name)}</div>
+  sh.forEach(x=>{L+=`<div class="box ${isReh(x)?"reh":"show"}"><div class="boxhead"><h3>${isReh(x)?"Rehearsal":"Show"}</h3>${edBtn("Shows",x)}</div>${artistOf(x)?`<div class="artist">🎤 ${esc(artistOf(x))}</div>`:editing()?`<button class="ed" type="button" data-edit="Shows" data-i="${idx("Shows",x)}" style="margin:4px 0">🎤 + ใส่ศิลปิน</button>`:""}<div class="big">${esc(x.name)}</div>
     <div class="sub">${esc([x.venue,x.city].filter(Boolean).join(" · "))}${x.address?"<br>"+esc(x.address):""}</div>
     <div class="sub" style="margin-top:4px">${x.setTime?`ขึ้นโชว์ <b class="mono">${esc(x.setTime)}</b>${x.setLen?" · "+esc(x.setLen)+" นาที":""}`:`<span class="waiting">เวลาโชว์: รอข้อมูล</span>`}</div>
     ${x.others?`<div class="sub">ร่วมเวที: ${esc(x.others)}</div>`:""}${x.contact?`<div class="sub">ผู้ติดต่อ: ${esc(x.contact)} ${esc(x.contactPhone)}</div>`:""}${x.loadIn?`<div class="sub">🚚 จุดโหลด: ${esc(x.loadIn)}</div>`:""}${x.room?`<div class="sub">🚪 ห้องพัก: ${esc(x.room)}</div>`:""}
@@ -610,7 +612,7 @@ function renderDay(s){
         <div class="side-col"><span class="tag">${esc(CATLAB[r.cat]||r.cat||"อื่นๆ")}</span>${edBtn("Schedule",r)}</div></div>`;
       if(ok&&m!=null)prev={m:mins(r.end)??m}});
   }
-  L+=`</section>${gearBox(sh)}</div><div class="foot">${esc(SOURCE)} · v6</div>`;
+  L+=`</section>${gearBox(sh)}</div><div class="foot">${esc(SOURCE)} · v7</div>`;
   $("#app").innerHTML=L;
   $("#copyBtn").onclick=()=>copyDay(s,sh,items);
   $("#printBtn").onclick=()=>{const t=document.title;document.title=printTitle();try{window.print()}catch(e){}setTimeout(()=>{document.title=t},1000)};
@@ -621,22 +623,21 @@ function renderCal(){const [y,m]=CALM.split("-").map(Number);const first=new Dat
   for(let d=1;d<=n;d++){const s=`${y}-${pad(m)}-${pad(d)}`;const sh=showsOn(s).filter(x=>x.status!=="Cancelled");const tr=travelOn(s);
     const ic=[...new Set(tr.map(r=>r.type==="Flight"?"✈︎":r.type==="Van"?"🚐":"➜"))].join(" ");
     const cls=["cd",sh.length?"has":"",s===t?"today":"",s<t?"past":""].filter(Boolean).join(" ");
-    cells.push(`<button type="button" class="${cls}" data-day="${s}"><span class="dn">${d}</span>${sh.map(x=>`<span class="ev${isReh(x)?" reh":""}">${esc(x.name)}</span>`).join("")}${ic?`<span class="ic">${ic}</span>`:""}</button>`)}
+    cells.push(`<button type="button" class="${cls}" data-day="${s}"><span class="dn">${d}</span>${sh.map(x=>`<span class="ev${isReh(x)?" reh":""}">${esc(artistOf(x)||x.name)}</span>`).join("")}${ic?`<span class="ic">${ic}</span>`:""}</button>`)}
   const shows=D.Shows.filter(x=>(x.date||"").slice(0,7)===CALM||(x.endDate||"").slice(0,7)===CALM).sort((a,b)=>a.date.localeCompare(b.date));
   const mn=first.toLocaleDateString("th-TH",{month:"long",year:"numeric"});
   $("#app").innerHTML=`<div class="calwrap"><div class="cal"><div class="calhead"><div><h2>${esc(mn)}</h2><div class="sub">${shows.length} งานในเดือนนี้</div></div><div class="calbtns"><button class="calnav" type="button" data-calnav="-1" aria-label="เดือนก่อน">‹</button><button class="calnav" type="button" data-calnav="0">วันนี้</button><button class="calnav" type="button" data-calnav="1" aria-label="เดือนถัดไป">›</button></div></div>
   <div class="calgrid">${["จ","อ","พ","พฤ","ศ","ส","อา"].map((w,i)=>`<div class="calw${i>4?" we":""}">${w}</div>`).join("")}${cells.join("")}</div>
   <div class="calleg"><span><i style="background:var(--ink)"></i>มีงาน</span><span>✈︎ 🚐 วันเดินทาง</span><span><i style="background:var(--ink);border-radius:999px"></i>วันนี้</span></div></div>
-  <div class="callist"><h2 class="lh">งานเดือนนี้ (${shows.length})</h2><div class="list">${shows.length?shows.map(x=>`<button class="lrow" type="button" data-day="${x.date}" style="${(x.endDate||x.date)<t?"opacity:.55":""}"><div><div class="big">${okDate(x.endDate)?fRange(x.date,x.endDate):fShort(x.date)}</div><div class="sub">${esc(x.setTime||"")}</div></div><div><div class="big">${esc(x.name)}</div><div class="sub">${esc([x.venue,x.city].filter(Boolean).join(" · "))}</div></div><span class="pill ${x.status==="Cancelled"?"off":"show"}">${x.status==="Cancelled"?"ยกเลิก":esc(x.type||"Show")}</span></button>`).join(""):`<div class="empty">เดือนนี้ยังไม่มีงาน</div>`}</div></div></div>`}
+  <div class="callist"><h2 class="lh">งานเดือนนี้ (${shows.length})</h2><div class="list">${shows.length?shows.map(x=>`<button class="lrow" type="button" data-day="${x.date}" style="${(x.endDate||x.date)<t?"opacity:.55":""}"><div><div class="big">${okDate(x.endDate)?fRange(x.date,x.endDate):fShort(x.date)}</div><div class="sub">${esc(x.setTime||"")}</div></div><div><div class="big">${artistOf(x)?esc(artistOf(x))+" · ":""}${esc(x.name)}</div><div class="sub">${esc([x.venue,x.city].filter(Boolean).join(" · "))}</div></div><span class="pill ${x.status==="Cancelled"?"off":"show"}">${x.status==="Cancelled"?"ยกเลิก":esc(x.type||"Show")}</span></button>`).join(""):`<div class="empty">เดือนนี้ยังไม่มีงาน</div>`}</div></div></div>`}
 function renderFlights(){const rows=[...D.Travel].sort((a,b)=>(a.date+a.dep).localeCompare(b.date+b.dep));
   $("#app").innerHTML=`<h2 class="lh">การเดินทางทั้งหมด (${rows.length}) ${addBtn("Travel","+ เพิ่ม",{})}</h2><div class="list">${rows.length?rows.map(r=>`<button class="lrow" type="button" data-day="${r.date}"><div><div class="big">${fShort(r.date)}</div><div class="sub mono">${esc(r.dep)}${r.arr?"–"+esc(r.arr):""}</div></div><div><div class="big">${esc(TT[r.type]||r.type)} ${esc(r.from)} → ${esc(r.to)}</div><div class="sub">${esc(strip(r.no))}${r.driver?" · คนขับ "+esc(r.driver):""}</div></div><span class="pill travel">${esc(r.who||"ทุกคน")}</span></button>`).join(""):`<div class="empty">ยังไม่มีข้อมูลการเดินทาง</div>`}</div>`}
 function renderHotels(){const rows=[...D.Hotels].sort((a,b)=>a.checkin.localeCompare(b.checkin));
   $("#app").innerHTML=`<h2 class="lh">โรงแรมทั้งหมด (${rows.length}) ${addBtn("Hotels","+ เพิ่ม",{})}</h2><div class="list">${rows.length?rows.map(h=>`<button class="lrow" type="button" data-day="${h.checkin}"><div><div class="big">${okDate(h.checkin)&&okDate(h.checkout)?fRange(h.checkin,h.checkout):""}</div></div><div><div class="big">${esc(strip(h.name))}</div><div class="sub">${esc(h.address)}${h.phone?" · "+esc(h.phone):""}</div></div><span class="pill off">${esc(h.rooms||"")}</span></button>`).join(""):`<div class="empty">ยังไม่มีข้อมูลโรงแรม</div>`}</div>`}
 function renderVenues(){const t=todayISO();const rows=[...D.Shows].sort((a,b)=>a.date.localeCompare(b.date));
   $("#app").innerHTML=`<h2 class="lh">งานทั้งหมด (${rows.length}) ${addBtn("Shows","+ เพิ่มงาน",{status:"Confirmed"})}</h2><div class="list">${rows.map(x=>{const ready=D.Schedule.some(r=>r.showId===x.id);const dup=D.Shows.filter(y=>y.date===x.date).length>1;
-    return `<button class="lrow" type="button" data-day="${x.date}" style="${(x.endDate||x.date)<t?"opacity:.55":""}"><div><div class="big">${okDate(x.endDate)?fRange(x.date,x.endDate):fShort(x.date)}</div><div class="sub">${esc(x.type)}</div></div><div><div class="big">${esc(x.name)}</div><div class="sub">${esc([x.venue,x.city].filter(Boolean).join(" · ")||"ยังไม่ระบุสถานที่")}${dup?" · <b>2 งานวันเดียวกัน</b>":""}</div></div><span class="pill ${x.status==="Cancelled"?"off":ready?"show":"wait"}">${x.status==="Cancelled"?"ยกเลิก":ready?"มีตาราง":"รอข้อมูล"}</span></button>`}).join("")}</div>`}
+    return `<button class="lrow" type="button" data-day="${x.date}" style="${(x.endDate||x.date)<t?"opacity:.55":""}"><div><div class="big">${okDate(x.endDate)?fRange(x.date,x.endDate):fShort(x.date)}</div><div class="sub">${esc(x.type)}</div></div><div><div class="big">${artistOf(x)?esc(artistOf(x))+" · ":""}${esc(x.name)}</div><div class="sub">${esc([x.venue,x.city].filter(Boolean).join(" · ")||"ยังไม่ระบุสถานที่")}${dup?" · <b>2 งานวันเดียวกัน</b>":""}</div></div><span class="pill ${x.status==="Cancelled"?"off":ready?"show":"wait"}">${x.status==="Cancelled"?"ยกเลิก":ready?"มีตาราง":"รอข้อมูล"}</span></button>`}).join("")}</div>`}
 
-const artistOf=x=>{const m=/ศิลปิน\s*:?\s*([^·\n]+)/.exec(x.notes||"");if(m)return m[1].trim();const i=(x.name||"").search(/\s[–-]\s/);return i>0?x.name.slice(0,i).trim():""};
 function copyDay(s,sh,items){const L=[];const SEP="━━━━━━━━━━━━━━";
   const d=dt(s);const fullDate=`${d.getDate()} ${d.toLocaleDateString("th-TH",{month:"long"})} ${d.getFullYear()}`;
   const groups=groupsForDay(s),cg=curGroup(groups);const vis=f=>matches(f)&&(!cg||forGroup(f,cg));
@@ -720,6 +721,9 @@ function fieldHtml(f,val){
   if(type==="who"){const sid=$("#f_showId")?.value||FORM_SHOW;const shw=D.Shows.find(s=>s.id===sid);const pool=shw?crewFor([shw]).list:realCrew();const toks=["ทุกคน",...parseGroups(shw?.tgroups).map(g=>g.name),"Artist","Band","Crew","Management",...pool.map(c=>c.short||c.name)];
     const cur=(val||"").split(",").map(s=>s.trim()).filter(Boolean);
     return `<div class="${cls}"><label for="${id}">${label}</label><input id="${id}" name="${k}" value="${esc(val)}" placeholder="ทุกคน" autocomplete="off"><div class="tok" data-for="${id}">${[...new Set(toks)].map(t=>`<button type="button" class="${cur.includes(t)?"on":""}" data-tok="${esc(t)}">${esc(t)}</button>`).join("")}</div></div>`}
+  if(type==="artist"){const cur=(val||"").split(",").map(s=>s.trim()).filter(Boolean);
+    const known=[...new Set(["PUN","Jeff Satur",...D.Shows.flatMap(x=>(x.artist||"").split(",").map(s=>s.trim())),...cur].filter(Boolean))];
+    return `<div class="${cls}"><label for="${id}">${label}</label><input id="${id}" name="${k}" value="${esc(val)}" placeholder="เช่น PUN, Jeff Satur" autocomplete="off"><div class="tok" data-for="${id}">${known.map(t=>`<button type="button" class="${cur.includes(t)?"on":""}" data-tok="${esc(t)}">🎤 ${esc(t)}</button>`).join("")}</div></div>`}
   if(type==="crew"){const cur=(val||"").split(",").map(s=>s.trim()).filter(Boolean);
     return `<div class="${cls}"><label for="${id}">${label}</label><input id="${id}" name="${k}" value="${esc(val)}" placeholder="ทุกคน" autocomplete="off"><div class="tok" data-for="${id}" data-mode="crew">${realCrew().map(c=>{const t=c.short||c.name;return `<button type="button" class="${cur.includes(t)?"on":""}" data-tok="${esc(t)}" title="${esc(c.role)}">${esc(t)} <span style="opacity:.6">· ${esc(c.role)}</span></button>`}).join("")}</div></div>`}
   if(type.startsWith("auto:")) return `<div class="${cls}"><label for="${id}">${label}</label><input id="${id}" name="${k}" value="${esc(val)}" readonly></div>`;
