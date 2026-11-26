@@ -165,6 +165,7 @@ main{padding:20px 22px 48px;min-width:0}
 button.rrow{cursor:pointer;border-color:var(--line)}
 .rrow.me{background:var(--ink);color:#fff}.rrow.me .rr{color:#ddd}
 .rn{font-weight:600}.rr{color:var(--muted);font-size:13px}
+.rr .bo{display:block;font-size:11px;line-height:1.35;margin-top:1px;color:var(--sun);font-weight:500}.rrow.me .bo{color:#f3b9b0}
 @media(min-width:760px){.roster.wide{grid-template-columns:repeat(2,1fr)}}
 .gear{grid-column:1/-1;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
 .ghead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
@@ -347,7 +348,7 @@ const FIELDS = {
   Shows:[["id","รหัส","auto:S"],["status","สถานะ","sel:Confirmed,TBC,Cancelled"],["date","วันที่","date"],["endDate","ถึงวันที่ (ถ้าหลายวัน)","date"],["name","ชื่องาน","text",1],["type","ประเภท","sel:Show,Festival,Pub,Event,Private"],["venue","Venue","text"],["city","เมือง","text"],["address","ที่อยู่","text",1],["map","ลิงก์แผนที่","url",1],["setTime","เวลาขึ้นโชว์","time"],["setLen","ความยาว (นาที)","number"],["others","ศิลปินร่วมเวที","text",1],["contact","ผู้ติดต่อหน้างาน","text"],["contactPhone","เบอร์ผู้ติดต่อ","tel"],["hotelId","Hotel ID","text"],["notes","หมายเหตุ","text",1],["crew","ทีมที่ไปงานนี้ (ไม่เลือก = ทุกคน)","crew",1]]
 };
 FIELDS.Setlist=[["showId","งาน","show"],["seq","ลำดับในลิสต์","number"],["no","เลขเพลง (ว่าง = ช่วงพูด/คั่น)","text"],["song","ชื่อเพลง / ช่วง","text",1],["key","คีย์","text"],["ver","เวอร์ชัน","text"],["notes","หมายเหตุ","text",1]];
-FIELDS.Crew=[["name","ชื่อ (ชื่อจริงหรือชื่อเล่น)","text",1],["short","ชื่อที่โชว์ในเว็บ","text"],["group","กลุ่ม","sel:Band,Crew,Management,Artist"],["role","ตำแหน่ง","text",1],["notes","หมายเหตุ","text",1]];
+FIELDS.Crew=[["name","ชื่อ (ชื่อจริงหรือชื่อเล่น)","text",1],["short","ชื่อที่โชว์ในเว็บ","text"],["group","กลุ่ม","sel:Band,Crew,Management,Artist"],["role","หน้าที่หน้างาน (On-site, English)","text",1],["notes","หน้าที่หลังบ้าน (Back office, English)","text",1]];
 FIELDS.Gear=[["id","รหัส","auto:G"],["showId","ใช้กับงาน","showall"],["cat","หมวด","sel:Drum,Bass,Guitar,Keyboard,Artist,System,Other"],["item","ชื่อของ","text",1],["detail","รายละเอียด / ของในกล่อง","text",1],["qty","จำนวน","text"]];
 const TITLES = {Gear:"ของ",Setlist:"เพลง",Schedule:"คิวเวลา",Travel:"การเดินทาง",Hotels:"โรงแรม",Shows:"งาน",Crew:"คนในทีม"};
 
@@ -431,7 +432,7 @@ function crewRoster(list){if(!list.length)return '<span class="sub">ยังไ
   const order=["Artist","Band","Crew","Management"];const groups={};list.forEach(c=>{const g=c.group||"Other";(groups[g]=groups[g]||[]).push(c)});
   const keys=Object.keys(groups).sort((a,b)=>(order.indexOf(a)+1||9)-(order.indexOf(b)+1||9));
   return keys.map(g=>`<div class="rg"><div class="rgh">${esc(GROUP_TH[g]||g)} · ${groups[g].length}</div>${groups[g].map(c=>{const mine=me()&&c.name===me();const role=c.role?esc(c.role):'<span class="sub">No role yet</span>';
-    const inner=`<span class="rn">${esc(c.short||c.name)}</span><span class="rr">${role}</span>`;
+    const inner=`<span class="rn">${esc(c.short||c.name)}</span><span class="rr">${role}${c.notes?`<small class="bo">Back office: ${esc(c.notes)}</small>`:""}</span>`;
     return editing()&&!c._extra?`<button type="button" class="rrow" data-edit="Crew" data-i="${idx("Crew",c)}">${inner}<span class="sub">✎</span></button>`:`<div class="rrow${mine?" me":""}">${inner}</div>`}).join("")}</div>`).join("")}
 const edBtn=(t,o,label="✎ แก้")=>`<button class="ed" type="button" data-edit="${t}" data-i="${idx(t,o)}">${label}</button>`;
 const addBtn=(t,label,preset)=>`<button class="ed" type="button" data-add="${t}" data-preset="${esc(JSON.stringify(preset||{}))}">${label}</button>`;
@@ -543,7 +544,7 @@ function renderDay(s){
         <div class="side-col"><span class="tag">${esc(CATLAB[r.cat]||r.cat||"อื่นๆ")}</span>${edBtn("Schedule",r)}</div></div>`;
       if(ok&&m!=null)prev={m:mins(r.end)??m}});
   }
-  L+=`</section>${gearBox(sh)}</div><div class="foot">${esc(SOURCE)} · v2</div>`;
+  L+=`</section>${gearBox(sh)}</div><div class="foot">${esc(SOURCE)} · v3</div>`;
   $("#app").innerHTML=L;
   $("#copyBtn").onclick=()=>copyDay(s,sh,items);
   $("#printBtn").onclick=()=>{try{window.print()}catch(e){}};
