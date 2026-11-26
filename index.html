@@ -197,6 +197,27 @@ button.rrow{cursor:pointer;border-color:var(--line)}
 .gprint table{width:100%;border-collapse:collapse;font-size:11px}.gprint th,.gprint td{border:1px solid #bbb;padding:4px 6px;text-align:left;vertical-align:top}
 .gprint th{background:#eee}.gprint tr.pc td{background:#222;color:#fff;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .gprint small{color:#555}.gprint tr{break-inside:avoid}.gprint td:nth-child(n+2){white-space:nowrap;width:1%}}
+.tgbar{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+.tgbar button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;font-weight:600;cursor:pointer;touch-action:manipulation}
+.tgbar button span{font-weight:500;color:var(--muted);margin-left:2px}
+.tgbar button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}.tgbar button[aria-selected="true"] span{color:#ccc}
+.tgmem{font-size:12.5px;color:var(--muted);margin:-2px 0 10px}
+.tgh{font-size:12px;font-weight:700;margin:10px 0 2px;color:var(--ink)}
+@media print{.tgbar{display:none}}
+.mapbox{margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid var(--line);aspect-ratio:16/9;background:var(--panel)}
+.mapbox iframe{width:100%;height:100%;border:0;display:block;filter:grayscale(.85) contrast(1.05)}
+.maprow{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:13.5px}
+.tgbox .tgcard{background:var(--panel);border-radius:12px;padding:10px;margin-top:8px;border:1px solid transparent}
+.tgbox .tgcard.on{border-color:var(--ink)}
+.tgt{font-weight:700}.tgt span{font-weight:500;color:var(--muted);font-size:12.5px}
+.tgm{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tgm span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:13px;font-weight:600}
+.tgm span small{font-weight:400;color:var(--muted);margin-left:4px;font-size:11px}
+.tgm span.me{background:var(--ink);color:#fff;border-color:var(--ink)}.tgm span.me small{color:#ccc}
+.calltime{display:grid;gap:3px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:14px}
+.tm small.du{opacity:.7;font-size:11px}
+.lc a.pin{white-space:nowrap;font-size:12px}
+@media print{.mapbox{display:none}}
 h2.lh{font-family:var(--font-display);font-weight:700;font-size:22px;margin:0 0 12px}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
 .toast.on{opacity:1}
@@ -331,7 +352,7 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const store = { get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}, del(k){try{localStorage.removeItem(k)}catch(e){}} };
 
 const KEYS = {
-  Shows:["id","date","endDate","name","type","venue","city","address","map","setTime","setLen","others","contact","contactPhone","hotelId","status","notes","crew"],
+  Shows:["id","date","endDate","name","type","venue","city","address","map","setTime","setLen","others","contact","contactPhone","hotelId","status","notes","crew","loadIn","room","tgroups"],
   Schedule:["showId","date","time","end","item","cat","who","loc","notes"],
   Travel:["id","showId","date","type","no","from","to","dep","arr","who","driver","driverPhone","pickup","ref","notes"],
   Hotels:["id","showId","name","address","phone","checkin","checkout","map","rooms","notes"],
@@ -346,7 +367,7 @@ const FIELDS = {
   Schedule:[["showId","งาน","show"],["date","วันที่","date"],["time","เวลา","time"],["end","ถึงเวลา","time"],["item","รายการ","text",1],["cat","ประเภท","sel:"+CATS.join(",")],["loc","สถานที่","text"],["who","ใครเกี่ยวข้อง","who",1],["notes","หมายเหตุ","text",1]],
   Travel:[["id","รหัส","auto:T"],["showId","งาน","show"],["date","วันที่","date"],["type","ประเภท","sel:Flight,Van,Car,Bus,Train,Boat"],["no","เลขไฟลต์ / ทะเบียนรถ","text",1],["from","จาก","text"],["to","ไป","text"],["dep","ออก","time"],["arr","ถึง","time"],["who","ใครไปเที่ยวนี้","who",1],["driver","คนขับ","text"],["driverPhone","เบอร์คนขับ","tel"],["pickup","จุดรับ","text",1],["ref","Booking ref","text"],["notes","หมายเหตุ","text"]],
   Hotels:[["id","รหัส","auto:H"],["showId","งาน","show"],["name","ชื่อโรงแรม","text",1],["address","ที่อยู่","text",1],["phone","เบอร์โรงแรม","tel"],["map","ลิงก์แผนที่","url"],["checkin","เช็กอิน","date"],["checkout","เช็กเอาต์","date"],["rooms","ห้อง / ใครพัก","text",1],["notes","หมายเหตุ","text",1]],
-  Shows:[["id","รหัส","auto:S"],["status","สถานะ","sel:Confirmed,TBC,Cancelled"],["date","วันที่","date"],["endDate","ถึงวันที่ (ถ้าหลายวัน)","date"],["name","ชื่องาน","text",1],["type","ประเภท","sel:Show,Festival,Pub,Event,Private"],["venue","Venue","text"],["city","เมือง","text"],["address","ที่อยู่","text",1],["map","ลิงก์แผนที่","url",1],["setTime","เวลาขึ้นโชว์","time"],["setLen","ความยาว (นาที)","number"],["others","ศิลปินร่วมเวที","text",1],["contact","ผู้ติดต่อหน้างาน","text"],["contactPhone","เบอร์ผู้ติดต่อ","tel"],["hotelId","Hotel ID","text"],["notes","หมายเหตุ","text",1],["crew","ทีมที่ไปงานนี้ (ไม่เลือก = ทุกคน)","crew",1]]
+  Shows:[["id","รหัส","auto:S"],["status","สถานะ","sel:Confirmed,TBC,Cancelled"],["date","วันที่","date"],["endDate","ถึงวันที่ (ถ้าหลายวัน)","date"],["name","ชื่องาน","text",1],["type","ประเภท","sel:Show,Festival,Pub,Event,Private"],["venue","Venue","text"],["city","เมือง","text"],["address","ที่อยู่","text",1],["map","ลิงก์แผนที่","url",1],["setTime","เวลาขึ้นโชว์","time"],["setLen","ความยาว (นาที)","number"],["others","ศิลปินร่วมเวที","text",1],["contact","ผู้ติดต่อหน้างาน","text"],["contactPhone","เบอร์ผู้ติดต่อ","tel"],["hotelId","Hotel ID","text"],["loadIn","จุดโหลด / ที่จอดรถ","text",1],["room","ห้องพัก / Green room (ที่หน้างาน)","text",1],["tgroups","ทีมเดินทาง (เช่น ทีมรถตู้: ภู, กิต | ทีมบิน: น๊อต, ไผ่) · เว้นว่าง = ไปด้วยกันทั้งหมด","text",1],["notes","หมายเหตุ","text",1],["crew","ทีมที่ไปงานนี้ (ไม่เลือก = ทุกคน)","crew",1]]
 };
 FIELDS.Setlist=[["showId","งาน","show"],["seq","ลำดับในลิสต์","number"],["no","เลขเพลง (ว่าง = ช่วงพูด/คั่น)","text"],["song","ชื่อเพลง / ช่วง","text",1],["key","คีย์","text"],["ver","เวอร์ชัน","text"],["notes","หมายเหตุ","text",1]];
 FIELDS.Crew=[["name","ชื่อ (ชื่อจริงหรือชื่อเล่น)","text",1],["short","ชื่อที่โชว์ในเว็บ","text"],["group","กลุ่ม","sel:Band,Crew,Management,Artist"],["role","หน้าที่หน้างาน (On-site, English)","text",1],["notes","หน้าที่หลังบ้าน (Back office, English)","text",1]];
@@ -407,7 +428,24 @@ function matches(field){const sel=me();if(!sel)return true;
   const w=(field||"").split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
   if(!w.length||w.includes("ทุกคน")||w.includes("everyone"))return true;
   const p=person(sel);const keys=[sel,p?.short,p?.group,p?.role].filter(Boolean).map(s=>s.toLowerCase());
-  return w.some(x=>keys.includes(x))}
+  if(w.some(x=>keys.includes(x)))return true;
+  const gs=parseGroups(D.Shows.map(x=>x.tgroups).filter(Boolean).join("|"));return gs.some(g=>w.includes(g.name.toLowerCase())&&memberKeys(g).has(sel.toLowerCase()))}
+/* ===== travel groups ===== */
+let GSEL=null; // null = auto (ตามคนที่เลือก), "" = ทั้งหมด, หรือชื่อทีม
+function parseGroups(str){return (str||"").split(/\||\n/).map(x=>x.trim()).filter(Boolean).map(x=>{const i=x.indexOf(":");if(i<0)return null;
+  const name=x.slice(0,i).replace(/^[^\p{L}\p{N}]+/u,"").trim();const members=x.slice(i+1).split(",").map(m=>m.trim()).filter(Boolean);
+  return name?{name,members,icon:/บิน|flight|fly/i.test(name)?"✈️":/รถ|van|car/i.test(name)?"🚐":"👥"}:null}).filter(Boolean)}
+function groupsForDay(s){const ids=new Set(showsOn(s).map(x=>x.id));D.Schedule.forEach(r=>r.date===s&&r.showId&&ids.add(r.showId));D.Travel.forEach(r=>r.date===s&&r.showId&&ids.add(r.showId));
+  const out=[];const seen=new Set();D.Shows.filter(x=>ids.has(x.id)).forEach(x=>parseGroups(x.tgroups).forEach(g=>{if(!seen.has(g.name)){seen.add(g.name);out.push(g)}}));return out}
+const memberKeys=g=>new Set(g.members.flatMap(m=>{const p=person(m);return [m,p?.name,p?.short].filter(Boolean)}).map(x=>x.toLowerCase()));
+function groupOf(name,groups){if(!name)return null;const p=person(name);const k=[name,p?.short,p?.name].filter(Boolean).map(x=>x.toLowerCase());return groups.find(g=>k.some(x=>memberKeys(g).has(x)))||null}
+function curGroup(groups){if(!groups.length)return null;if(GSEL===null){return groupOf(me(),groups)}return groups.find(g=>g.name===GSEL)||null}
+/* แถวนี้เป็นของทีม g ไหม (ทุกคน/ว่าง = ของทุกทีม) */
+function forGroup(field,g){const w=(field||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);
+  if(!w.length||w.includes("ทุกคน")||w.includes("everyone"))return true;
+  if(w.includes(g.name.toLowerCase()))return true;const mk=memberKeys(g);if(w.some(x=>mk.has(x)))return true;
+  const ms=g.members.map(person).filter(Boolean);return w.some(x=>ms.some(p=>[p.group,p.role].filter(Boolean).map(y=>y.toLowerCase()).includes(x)))}
+const isCommon=field=>{const w=(field||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);return !w.length||w.includes("ทุกคน")||w.includes("everyone")};
 function isMeTok(x){const sel=me();if(!sel||x==="ทุกคน")return false;const p=person(sel);return [sel,p?.short,p?.group].filter(Boolean).map(s=>s.toLowerCase()).includes(x.toLowerCase())}
 function allDays(){const set=new Set();
   D.Shows.forEach(s=>{if(!okDate(s.date))return;set.add(s.date);if(okDate(s.endDate)){const d=dt(s.date),e=dt(s.endDate);while(d<e){d.setDate(d.getDate()+1);set.add(iso(d))}}});
@@ -416,6 +454,11 @@ const showsOn=s=>D.Shows.filter(x=>x.date===s||(x.endDate&&x.date<=s&&s<=x.endDa
 const travelOn=s=>D.Travel.filter(r=>r.date===s).sort((a,b)=>(mins(a.dep)??9999)-(mins(b.dep)??9999));
 const hotelFor=s=>D.Hotels.find(h=>h.checkin&&h.checkout&&h.checkin<=s&&s<h.checkout);
 function dayKind(s){const sh=showsOn(s).length,tr=travelOn(s).length;return sh&&tr?["both","Travel + Show"]:sh?["show","Show"]:tr?["travel","Travel"]:["off","Off"]}
+const gq=(...a)=>encodeURIComponent(a.filter(Boolean).join(" "));
+const mapEmbed=(q)=>`<div class="mapbox"><iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=${q}&z=15&output=embed" title="แผนที่"></iframe></div>`;
+function originFor(s,x){const its=D.Schedule.filter(r=>r.date===s&&r.loc&&/Van|Lobby|Hotel/.test(r.cat)).sort((a,b)=>(mins(a.time)??9999)-(mins(b.time)??9999));
+  const v=(x.venue||"").toLowerCase();const r=its.find(r=>!v||!r.loc.toLowerCase().includes(v));if(r)return r.loc.replace(/^(hotel|โรงแรม)\s*/i,"Hotel ").trim();const h=hotelFor(s);return h?strip(h.name):""}
+const durMin=(a,b)=>{const x=mins(a),y=mins(b);if(x==null||y==null)return null;let d=y-x;if(d<0)d+=1440;return d};
 function mapLink(name,map,addr){const q=map||("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent([name,addr].filter(Boolean).join(" ")));return `<a href="${esc(q)}" target="_blank" rel="noopener">เปิดแผนที่</a>`}
 const idx=(t,o)=>D[t].indexOf(o);
 const linkify=s=>esc(s).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener">${/maps\.app|goo\.gl\/maps|google\.com\/maps/.test(u)?"แผนที่":"ลิงก์"}</a>`);
@@ -502,7 +545,8 @@ function renderSide(){const days=allDays();const t=todayISO();
   const cur=$("#side [aria-current='true']");if(cur){const sd=$("#side");const a=cur.offsetLeft-sd.offsetLeft,b=cur.offsetTop-sd.offsetTop;if(a<sd.scrollLeft||a+cur.offsetWidth>sd.scrollLeft+sd.clientWidth)sd.scrollLeft=a-12;if(b<sd.scrollTop||b+cur.offsetHeight>sd.scrollTop+sd.clientHeight)sd.scrollTop=b-12}}
 
 function renderDay(s){
-  const sh=showsOn(s),tr=travelOn(s).filter(r=>matches(r.who)),[,kl]=dayKind(s);
+  const groups=groupsForDay(s),cg=curGroup(groups);const vis=f=>matches(f)&&(!cg||forGroup(f,cg));
+  const sh=showsOn(s),tr=travelOn(s).filter(r=>vis(r.who)),[,kl]=dayKind(s);
   const route=tr.length?`${tr[0].from} → ${tr[tr.length-1].to}`:"";
   const title=sh.length?sh.map(x=>x.venue||x.name).join(" / "):route||"วันว่าง";
   const showId=sh[0]?.id||"";
@@ -511,16 +555,23 @@ function renderDay(s){
   sh.forEach(x=>{L+=`<div class="box show"><div class="boxhead"><h3>Show</h3>${edBtn("Shows",x)}</div><div class="big">${esc(x.name)}</div>
     <div class="sub">${esc([x.venue,x.city].filter(Boolean).join(" · "))}${x.address?"<br>"+esc(x.address):""}</div>
     <div class="sub" style="margin-top:4px">${x.setTime?`ขึ้นโชว์ <b class="mono">${esc(x.setTime)}</b>${x.setLen?" · "+esc(x.setLen)+" นาที":""}`:`<span class="waiting">เวลาโชว์: รอข้อมูล</span>`}</div>
-    ${x.others?`<div class="sub">ร่วมเวที: ${esc(x.others)}</div>`:""}${x.contact?`<div class="sub">ผู้ติดต่อ: ${esc(x.contact)} ${esc(x.contactPhone)}</div>`:""}
-    <div class="sub">${mapLink(x.venue||x.name,x.map,[x.address,x.city].join(" "))}</div>${x.notes?`<div class="sub" style="margin-top:4px">${linkify(x.notes)}</div>`:""}</div>`});
+    ${x.others?`<div class="sub">ร่วมเวที: ${esc(x.others)}</div>`:""}${x.contact?`<div class="sub">ผู้ติดต่อ: ${esc(x.contact)} ${esc(x.contactPhone)}</div>`:""}${x.loadIn?`<div class="sub">🚚 จุดโหลด: ${esc(x.loadIn)}</div>`:""}${x.room?`<div class="sub">🚪 ห้องพัก: ${esc(x.room)}</div>`:""}
+    ${x.notes?`<div class="sub" style="margin-top:4px">${linkify(x.notes)}</div>`:""}
+    ${x.venue?mapEmbed(gq(x.venue,x.address,x.city)):""}
+    <div class="maprow">${mapLink(x.venue||x.name,x.map,[x.address,x.city].join(" "))}${(()=>{const o=originFor(s,x);return o?`<a href="https://www.google.com/maps/dir/?api=1&origin=${gq(o,x.city)}&destination=${gq(x.venue||x.name,x.city)}" target="_blank" rel="noopener">🧭 เส้นทาง ${esc(o)} → ${esc(x.venue||x.name)}</a>`:`<a href="https://www.google.com/maps/dir/?api=1&destination=${gq(x.venue||x.name,x.city)}" target="_blank" rel="noopener">🧭 นำทางไปหน้างาน</a>`})()}</div></div>`});
+  if(groups.length||(editing()&&sh.length))L+=`<div class="box tgbox"><div class="boxhead"><h3>ทีมเดินทาง</h3>${sh.length?`<button class="ed" type="button" data-teamedit="${idx("Shows",sh[0])}">${groups.length?"✎ แก้ทีม":"+ ตั้งทีมเดินทาง"}</button>`:""}</div>${groups.length?"":`<div class="sub">ยังไม่ได้แบ่งทีม (ทุกคนเดินทางด้วยกัน)</div>`}${groups.map(g=>`<div class="tgcard${cg&&cg.name===g.name?" on":""}"><div class="tgt">${g.icon} ${esc(g.name)} <span>${g.members.length} คน</span></div><div class="tgm">${g.members.map(n=>{const p=person(n);return `<span class="${me()&&(p?.name===me()||n===me())?"me":""}">${esc(p?.short||n)}${p?.role?`<small>${esc(p.role.replace(/\s*\(เช็ก\)\s*/g," ").trim())}</small>`:""}</span>`}).join("")}</div></div>`).join("")}</div>`;
   sh.forEach(x=>{const sl=setlistOf(x.id);if(!sl.length&&!editing())return;const songs=sl.filter(r=>r.no).length;
     L+=`<div class="box setlist"><div class="boxhead"><h3>Setlist${sh.length>1?" · "+esc(x.name):""} · ${songs} เพลง</h3>${addBtn("Setlist","+ เพิ่ม",{showId:x.id,seq:nextSeq(x.id)})}</div>${sl.map(r=>r.no?`<div class="sl"><span class="sl-n">${esc(r.no)}</span><span class="sl-s">${esc(r.song)}${r.ver?` <small>${esc(r.ver)}</small>`:""}${r.notes?` <small>· ${esc(r.notes)}</small>`:""}</span>${r.key?`<span class="sl-k">${esc(r.key)}</span>`:""}${edBtn("Setlist",r,"✎")}</div>`:`<div class="sl seg"><span>${/^[—–-]+$/.test(r.song)?"":esc(r.song)}</span>${edBtn("Setlist",r,"✎")}</div>`).join("")||'<div class="sub">ยังไม่มีลิสต์เพลง</div>'}</div>`});
   L+=`<div class="box travel"><div class="boxhead"><h3>Travel</h3>${addBtn("Travel","+ เพิ่ม",{date:s,showId})}</div>`;
-  if(tr.length){L+=`<div class="big">${tr.length} เที่ยว · ${esc(route)}</div>`+tr.map(r=>`<div class="leg"><div class="boxhead"><span><b>${esc(strip(r.no)||TT[r.type]||r.type)}</b> <span class="sub">${esc(TT[r.type]||r.type)}</span></span>${edBtn("Travel",r)}</div><span class="mono">${esc(r.from)} ${esc(r.dep)} → ${esc(r.to)} ${esc(r.arr)}</span> · ${esc(r.who||"ทุกคน")}${r.driver?`<br><span class="sub">คนขับ ${esc(r.driver)} ${esc(r.driverPhone)}</span>`:""}${r.pickup?`<br><span class="sub">จุดรับ: ${esc(r.pickup)}</span>`:""}</div>`).join("")}
-  else L+=`<div class="sub">ไม่มีการเดินทางวันนี้</div>`;
+  const legHtml=r=>`<div class="leg"><div class="boxhead"><span><b>${esc(strip(r.no)||TT[r.type]||r.type)}</b> <span class="sub">${esc(TT[r.type]||r.type)}</span></span>${edBtn("Travel",r)}</div><span class="mono">${esc(r.from)} ${esc(r.dep)} → ${esc(r.to)} ${esc(r.arr)}</span>${durMin(r.dep,r.arr)?` <span class="sub">(${dur(durMin(r.dep,r.arr))})</span>`:""} · ${esc(r.who||"ทุกคน")}${r.driver?`<br><span class="sub">คนขับ ${esc(r.driver)} ${esc(r.driverPhone)}</span>`:""}${r.pickup?`<br><span class="sub">จุดรับ: ${esc(r.pickup)}</span>`:""}</div>`;
+  if(tr.length){L+=`<div class="big">${tr.length} เที่ยว${cg?" · "+cg.icon+" "+esc(cg.name):""}</div>`;
+    if(groups.length&&!cg){const used=new Set();const prim=r=>{const w=(r.who||"").split(",").map(x=>x.trim().toLowerCase());return groups.find(g=>w.includes(g.name.toLowerCase()))||groups.find(g=>forGroup(r.who,g))};groups.forEach(g=>{const legs=tr.filter(r=>!isCommon(r.who)&&prim(r)===g);legs.forEach(r=>used.add(r));if(legs.length)L+=`<div class="tgh">${g.icon} ${esc(g.name)} <span class="sub">· ${esc(g.members.join(", "))}</span></div>`+legs.map(legHtml).join("")});
+      const rest=tr.filter(r=>!used.has(r));if(rest.length)L+=`<div class="tgh">👥 ทุกคน</div>`+rest.map(legHtml).join("")}
+    else L+=tr.map(legHtml).join("")}
+  else L+=`<div class="sub">${cg?"ทีมนี้ไม่มีการเดินทางวันนี้":"ไม่มีการเดินทางวันนี้"}</div>`;
   L+=`</div>`;
   const ht=hotelFor(s);
-  L+=`<div class="box hotel"><div class="boxhead"><h3>Hotel tonight</h3>${ht?edBtn("Hotels",ht):addBtn("Hotels","+ เพิ่ม",{checkin:s,showId})}</div>${ht?`<div class="big">${esc(strip(ht.name))}</div><div class="sub">${esc(ht.address)}</div>${ht.phone?`<div class="sub">โทร: ${esc(ht.phone)}</div>`:""}${ht.rooms?`<div class="sub">${esc(ht.rooms)}</div>`:""}<div class="sub">${mapLink(ht.name,ht.map,ht.address)}</div>`:`<div class="sub">${sh.length?'<span class="waiting">รอข้อมูล</span> หรือไม่ได้ค้างคืน':"ไม่มี"}</div>`}</div>`;
+  L+=`<div class="box hotel"><div class="boxhead"><h3>Hotel tonight</h3>${ht?edBtn("Hotels",ht):addBtn("Hotels","+ เพิ่ม",{checkin:s,showId})}</div>${ht?`<div class="big">${esc(strip(ht.name))}</div><div class="sub">${esc(ht.address)}</div>${ht.phone?`<div class="sub">โทร: ${esc(ht.phone)}</div>`:""}${ht.rooms?`<div class="sub">${esc(ht.rooms)}</div>`:""}${mapEmbed(gq(strip(ht.name),ht.address))}<div class="maprow">${mapLink(ht.name,ht.map,ht.address)}</div>`:`<div class="sub">${sh.length?'<span class="waiting">รอข้อมูล</span> หรือไม่ได้ค้างคืน':"ไม่มี"}</div>`}</div>`;
   const links=D.Links.filter(l=>sh.some(x=>x.id===l.showId));
   if(links.length)L+=`<div class="box"><h3>Docs</h3>${links.map(l=>`<div style="display:flex;justify-content:space-between;gap:8px"><span>${esc(l.label)}</span>${l.url?`<a href="${esc(l.url)}" target="_blank" rel="noopener">เปิด</a>`:`<span class="waiting">รอลิงก์</span>`}</div>`).join("")}</div>`;
   const cf=crewFor(sh);
@@ -528,27 +579,34 @@ function renderDay(s){
   L+=`</div>`;
 
   const items=D.Schedule.filter(r=>r.date===s).sort((a,b)=>(mins(a.time)??9999)-(mins(b.time)??9999));
-  const mine=items.filter(r=>matches(r.who));
-  L+=`<section class="sched"><div class="hd"><b>ตาราง${kl==="Off"?"":" "+kl+" day"}</b><span>${mine.length} รายการ${me()?" ของ "+esc(person(me())?.short||me()):""} ${addBtn("Schedule","+ เพิ่มคิว",{date:s,showId})}</span></div>`;
+  const mine=items.filter(r=>vis(r.who));
+  L+=`<section class="sched"><div class="hd"><b>ตาราง${kl==="Off"?"":" "+kl+" day"}</b><span>${mine.length} รายการ${me()?" ของ "+esc(person(me())?.short||me()):cg?" ของ "+esc(cg.name):""} ${addBtn("Schedule","+ เพิ่มคิว",{date:s,showId})}</span></div>`;
+  if(items.length){const first=f=>items.find(r=>mins(r.time)!=null&&f(r));const ct=[];
+    if(groups.length)groups.forEach(g=>{const r=first(r=>!isCommon(r.who)&&forGroup(r.who,g))||first(r=>forGroup(r.who,g));if(r)ct.push(`${g.icon} ${esc(g.name)} เริ่ม <b>${esc(r.time)}</b> ${esc(strip(r.item))}`)});
+    else{const r=first(()=>true);if(r)ct.push(`เริ่ม <b>${esc(r.time)}</b> ${esc(strip(r.item))}`)}
+    const sc=first(r=>r.cat==="Soundcheck");if(sc)ct.push(`🎚 ซาวด์เช็ก <b>${esc(sc.time)}</b>`);
+    const so=sh.find(x=>x.setTime);if(so)ct.push(`🎤 โชว์ <b>${esc(so.setTime)}</b>${so.setLen?" · "+esc(so.setLen)+" นาที":""}`);
+    if(ct.length)L+=`<div class="calltime">${ct.map(x=>`<div>${x}</div>`).join("")}</div>`}
+  if(groups.length)L+=`<div class="tgbar" role="tablist"><button type="button" data-tg="" aria-selected="${!cg}">ทั้งหมด</button>${groups.map(g=>`<button type="button" data-tg="${esc(g.name)}" aria-selected="${cg?.name===g.name}">${g.icon} ${esc(g.name)} <span>${g.members.length}</span></button>`).join("")}</div>${cg?`<div class="tgmem">${cg.icon} ${esc(cg.name)}: ${esc(cg.members.join(", "))}</div>`:""}`;
   if(!items.length)L+=`<div class="empty">ยังไม่มีตารางเวลาของวันนี้<br>${LIVE?"กด ✎ แก้ไข แล้ว + เพิ่มคิว":"เพิ่มได้ในแท็บ Schedule ของ Google Sheet"}</div>`;
   else{
     if(items.some(r=>/^\(ตัวอย่าง\)/.test(r.item)))L+=`<div class="notice">ตารางวันนี้เป็นตัวอย่าง (เวลาสมมติ) รอแก้เป็นเวลาจริง</div>`;
     let period="",prev=null;
     items.forEach(r=>{const m=mins(r.time);const p=m==null?"ไม่ระบุเวลา":m<720?"เช้า":m<1020?"บ่าย":"เย็น / ค่ำ";
       if(p!==period){period=p;L+=`<div class="period">${p}</div>`}
-      const ok=matches(r.who);
+      const ok=vis(r.who);
       if(prev&&ok&&m!=null){const g=m-prev.m;if(g>=60)L+=`<div class="gap">อีก ${dur(g)} ถึง ${esc(strip(r.item))}</div>`}
       const ppl=(r.who||"").split(",").map(x=>x.trim()).filter(Boolean);
-      L+=`<div class="mo c-${esc(CATS.includes(r.cat)?r.cat:"Other")}${ok?"":" dim"}"><div class="tm">${esc(r.time||"–")}${r.end?`<small>ถึง ${esc(r.end)}</small>`:""}</div>
-        <div><div class="ti">${esc(strip(r.item))}</div>${r.loc?`<div class="lc">${linkify(r.loc)}</div>`:""}${r.notes?`<div class="lc">${linkify(r.notes)}</div>`:""}
+      L+=`<div class="mo c-${esc(CATS.includes(r.cat)?r.cat:"Other")}${ok?"":" dim"}"><div class="tm">${esc(r.time||"–")}${r.end?`<small>ถึง ${esc(r.end)}</small>`:""}${durMin(r.time,r.end)?`<small class="du">${dur(durMin(r.time,r.end))}</small>`:""}</div>
+        <div><div class="ti">${esc(strip(r.item))}</div>${r.loc?`<div class="lc">${linkify(r.loc)}${/https?:/.test(r.loc)?"":` <a class="pin" href="https://www.google.com/maps/search/?api=1&query=${gq(r.loc,sh[0]?.city)}" target="_blank" rel="noopener">📍 แผนที่</a>`}</div>`:""}${r.notes?`<div class="lc">${linkify(r.notes)}</div>`:""}
         <div class="ppl">${ppl.map(x=>`<span class="${isMeTok(x)?"me":""}">${esc(x)}</span>`).join("")}</div></div>
         <div class="side-col"><span class="tag">${esc(CATLAB[r.cat]||r.cat||"อื่นๆ")}</span>${edBtn("Schedule",r)}</div></div>`;
       if(ok&&m!=null)prev={m:mins(r.end)??m}});
   }
-  L+=`</section>${gearBox(sh)}</div><div class="foot">${esc(SOURCE)} · v4</div>`;
+  L+=`</section>${gearBox(sh)}</div><div class="foot">${esc(SOURCE)} · v5</div>`;
   $("#app").innerHTML=L;
   $("#copyBtn").onclick=()=>copyDay(s,sh,items);
-  $("#printBtn").onclick=()=>{try{window.print()}catch(e){}};
+  $("#printBtn").onclick=()=>{const t=document.title;document.title=printTitle();try{window.print()}catch(e){}setTimeout(()=>{document.title=t},1000)};
 }
 
 function renderCal(){const [y,m]=CALM.split("-").map(Number);const first=new Date(y,m-1,1);const n=new Date(y,m,0).getDate();const t=todayISO();
@@ -571,13 +629,60 @@ function renderVenues(){const t=todayISO();const rows=[...D.Shows].sort((a,b)=>a
   $("#app").innerHTML=`<h2 class="lh">งานทั้งหมด (${rows.length}) ${addBtn("Shows","+ เพิ่มงาน",{status:"Confirmed"})}</h2><div class="list">${rows.map(x=>{const ready=D.Schedule.some(r=>r.showId===x.id);const dup=D.Shows.filter(y=>y.date===x.date).length>1;
     return `<button class="lrow" type="button" data-day="${x.date}" style="${(x.endDate||x.date)<t?"opacity:.55":""}"><div><div class="big">${okDate(x.endDate)?fRange(x.date,x.endDate):fShort(x.date)}</div><div class="sub">${esc(x.type)}</div></div><div><div class="big">${esc(x.name)}</div><div class="sub">${esc([x.venue,x.city].filter(Boolean).join(" · ")||"ยังไม่ระบุสถานที่")}${dup?" · <b>2 งานวันเดียวกัน</b>":""}</div></div><span class="pill ${x.status==="Cancelled"?"off":ready?"show":"wait"}">${x.status==="Cancelled"?"ยกเลิก":ready?"มีตาราง":"รอข้อมูล"}</span></button>`}).join("")}</div>`}
 
-function copyDay(s,sh,items){const L=[`📅 ${dt(s).toLocaleDateString("th-TH",{weekday:"long",day:"numeric",month:"long"})}`];
-  sh.forEach(x=>L.push(`🎤 ${x.name}${x.venue?" @ "+x.venue:""}${x.city?" ("+x.city+")":""}${x.setTime?" ขึ้น "+x.setTime:""}`));
-  const ht=hotelFor(s);if(ht)L.push(`🛏 ${strip(ht.name)}`);
-  sh.forEach(x=>{const sl=setlistOf(x.id);if(sl.length){L.push("🎵 Setlist");sl.forEach(r=>L.push(r.no?`  ${r.no}. ${r.song}${r.key?" ("+r.key+")":""}${r.ver?" "+r.ver:""}`:(/^[—–-]+$/.test(r.song)?"  ———":`  — ${r.song} —`)))}});
-  if(sh.length){const cf=crewFor(sh);if(cf.custom)L.push(`👥 ${cf.list.map(c=>c.short||c.name).join(", ")}`)}
-  travelOn(s).filter(r=>matches(r.who)).forEach(r=>L.push(`🚐 ${TT[r.type]||r.type} ${r.from}→${r.to} ${r.dep}${r.arr?"-"+r.arr:""} ${strip(r.no)}${r.driver?" คนขับ "+r.driver+" "+r.driverPhone:""}`.trim()));
-  L.push("");items.filter(r=>matches(r.who)).forEach(r=>L.push(`${r.time||"--:--"}  ${strip(r.item)}${r.who&&r.who!=="ทุกคน"?" ["+r.who+"]":""}${r.loc?" @ "+r.loc:""}`));
+const artistOf=x=>{const m=/ศิลปิน\s*:?\s*([^·\n]+)/.exec(x.notes||"");if(m)return m[1].trim();const i=(x.name||"").search(/\s[–-]\s/);return i>0?x.name.slice(0,i).trim():""};
+function copyDay(s,sh,items){const L=[];const SEP="━━━━━━━━━━━━━━";
+  const d=dt(s);const fullDate=`${d.getDate()} ${d.toLocaleDateString("th-TH",{month:"long"})} ${d.getFullYear()}`;
+  const groups=groupsForDay(s),cg=curGroup(groups);const vis=f=>matches(f)&&(!cg||forGroup(f,cg));
+  const its=items.filter(r=>vis(r.who));
+  const tag=r=>r.who&&!isCommon(r.who)?` [${r.who}]`:"";
+  const tr2=(a,b)=>a?(b?`${a} - ${b}`:a):"";
+  const urls=t=>(t||"").match(/https?:\/\/\S+/g)||[];
+  const noUrl=t=>(t||"").replace(/(แผนที่|map)\s*:?\s*https?:\/\/\S+/ig,"").replace(/https?:\/\/\S+/g,"").replace(/\s*·\s*·\s*/g," · ").replace(/^[\s·:]+|[\s·:]+$/g,"").trim();
+  const skipU=new Set(sh.map(x=>x.map).filter(Boolean));
+  const noteLines=(r,plain)=>{const o=[];const t=noUrl(r.notes);if(t)o.push(plain?t.replace(/^ติดต่อ\s*/,"เบอร์ติดต่อ "):`(${t})`);urls(r.notes).concat(urls(r.loc)).filter(u=>!skipU.has(u)).forEach(u=>o.push(u));return o};
+  const block=(title,arr)=>{if(!arr.length)return;L.push("",title,SEP);arr.forEach(x=>L.push(x));L.push(SEP)};
+  // ===== หัว =====
+  if(sh.length)sh.forEach((x,i)=>{if(i)L.push("");
+    L.push(`งาน : ${x.name}`,...(artistOf(x)?[`🎤 ศิลปิน : ${artistOf(x)}`]:[]),`📅 วันที่แสดง : ${fullDate}`,`📍 สถานที่ : ${[x.venue,x.city].filter(Boolean).join(" ")}`);
+    const mp=x.map||(x.venue?"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent([x.venue,x.address,x.city].filter(Boolean).join(" ")):"");if(mp)L.push(mp);
+    if(x.others)L.push(`🎶 ร่วมเวที : ${x.others}`);
+    if(x.contact||x.contactPhone)L.push(`☎️ ผู้ติดต่อ : ${[x.contact,x.contactPhone].filter(Boolean).join(" ")}`);
+    if(x.loadIn)L.push(`🚚 จุดโหลด / ที่จอดรถ : ${x.loadIn}`);
+    if(x.room)L.push(`🚪 ห้องพัก : ${x.room}`);});
+  else L.push(`📅 ${fullDate}`);
+  const ht=hotelFor(s);if(ht)L.push(`🛏 โรงแรมคืนนี้ : ${strip(ht.name)}${ht.map?"\n"+ht.map:""}`);
+  if(groups.length){L.push("");(cg?[cg]:groups).forEach(g=>L.push(`${g.icon} ${g.name} : ${g.members.join(", ")}`))}
+  // ===== เวที =====
+  const stage=its.filter(r=>r.cat==="Setup"||r.cat==="Soundcheck");
+  block("เวที :",stage.flatMap(r=>{const dm=durMin(r.time,r.end);const lab=r.cat==="Soundcheck"&&/sound\s*check|ซาวด์/i.test(r.item)?r.item.replace(/sound\s*check/i,"SOUND CHECK"):strip(r.item);
+    const lab2=lab.replace(/\s*\(\d+\s*นาที\)/,"");return [`${lab2} : ${tr2(r.time,r.end)}${r.cat==="Soundcheck"?" น.":""}${r.cat==="Soundcheck"&&dm?` (${dm} นาที)`:""}${tag(r)}`,...noteLines(r)]}));
+  // ===== โชว์ =====
+  const shows=its.filter(r=>r.cat==="Show");const songs=sh.flatMap(x=>setlistOf(x.id).filter(r=>r.no));
+  if(shows.length||sh.some(x=>x.setTime)){L.push("","🌻 SHOW",`📅 วันที่ : ${fullDate}`);
+    if(shows.length)shows.forEach(r=>{L.push(`⏰ เวลา : ${tr2(r.time,r.end)} ${strip(r.item)}${tag(r)}`);noteLines(r).filter(x=>!(songs.length&&songs.some(g=>x.includes(g.song)))).forEach(x=>L.push(x))});
+    else sh.filter(x=>x.setTime).forEach(x=>L.push(`⏰ เวลา : ${x.setTime}${x.setLen?" ("+x.setLen+" นาที)":""}`));
+    if(songs.length)songs.forEach(r=>L.push(` ⁃ ${r.song}${r.key?" ("+r.key+")":""}${r.ver?" "+r.ver:""}`))}
+  // ===== รถตู้ / นัดหมาย =====
+  const van=its.filter(r=>r.cat==="Van"||r.cat==="Lobby");
+  if(van.length){L.push("","🚐 นัดหมายรถตู้");let n=0;
+    van.forEach(r=>{let t=strip(r.item);let lab;
+      if(r.cat==="Lobby")lab=t;
+      else{const m=/^จุดที่\s*(\d+)\s*[·:\-]?\s*/.exec(t)||/\(?\s*จุดที่\s*(\d+)\s*\)?/.exec(t);if(m){n=+m[1];t=t.replace(m[0]," ").trim()}else n++;
+        t=t.replace(/^รถตู้\s*/,"").replace(/\s{2,}/g," ").trim();lab=`จุดที่ ${n} ${t}`}
+      L.push("",`${lab}${tag(r)}`,` ⁃ เวลา ${r.time||"--:--"} น.`);if(r.loc&&!/^https?:/.test(r.loc))L.push(r.loc);noteLines(r,true).forEach(x=>L.push(x))});
+    travelOn(s).filter(r=>r.type!=="Flight"&&vis(r.who)&&(r.driver||r.driverPhone)).forEach(r=>L.push("",`คนขับ : ${[r.driver,r.driverPhone].filter(Boolean).join(" ")}${r.no?" · "+strip(r.no):""}`))}
+  // ===== เที่ยวบิน =====
+  const fl=its.filter(r=>r.cat==="Flight"||r.cat==="Airport");const tf=travelOn(s).filter(r=>r.type==="Flight"&&vis(r.who));
+  if(fl.length||tf.length){L.push("","✈️ เที่ยวบิน");
+    if(fl.length)fl.forEach(r=>{L.push(` ⁃ ${tr2(r.time,r.end)} ${strip(r.item)}${tag(r)}`);noteLines(r).forEach(x=>L.push("   "+x))});
+    else tf.forEach(r=>L.push(` ⁃ ${r.dep}${r.arr?" - "+r.arr:""} ${r.from} → ${r.to} ${strip(r.no)}${tag(r)}`))}
+  // ===== อื่นๆ =====
+  const oth=its.filter(r=>!["Setup","Soundcheck","Show","Van","Lobby","Flight","Airport"].includes(r.cat));
+  if(oth.length){L.push("","📌 อื่นๆ");oth.forEach(r=>{L.push(` ⁃ ${tr2(r.time,r.end)||"--:--"} ${strip(r.item)}${tag(r)}${r.loc?" @ "+noUrl(r.loc):""}`);noteLines(r).forEach(x=>L.push("   "+x))})}
+  // ===== ทีมงาน =====
+  if(sh.length){const cf=crewFor(sh);if(cf.list.length){L.push("",`👥 ทีมงาน (${cf.list.length} คน)`);
+    const order=["Artist","Band","Crew","Management"];const g={};cf.list.forEach(c=>{const k=c.group||"Other";(g[k]=g[k]||[]).push(c)});
+    Object.keys(g).sort((a,b)=>(order.indexOf(a)+1||9)-(order.indexOf(b)+1||9)).forEach(k=>{L.push(`【${GROUP_TH[k]||k}】`);g[k].forEach(c=>L.push(` ⁃ ${c.short||c.name}${c.role?" – "+c.role.replace(/\s*\(เช็ก\)\s*/g," ").trim():""}`))})}}
   L.push("","ตารางเต็ม: "+location.href.split("#")[0]+"#d-"+s);const text=L.join("\n");
   const ok=()=>toast("คัดลอกแล้ว วางในกลุ่ม LINE ได้เลย");
   if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(ok,()=>box(text));else box(text);
@@ -602,7 +707,7 @@ function fieldHtml(f,val){
   if(type==="showall") return `<div class="${cls}"><label for="${id}">${label}</label><select id="${id}" name="${k}"><option value="">ทุกงาน (ของประจำ)</option>${[...D.Shows].sort((a,b)=>a.date.localeCompare(b.date)).map(s=>`<option value="${esc(s.id)}"${s.id===val?" selected":""}>เฉพาะ ${fShort(s.date)} · ${esc(s.name)}</option>`).join("")}</select></div>`;
   if(type==="show") return `<div class="${cls}"><label for="${id}">${label}</label><select id="${id}" name="${k}"><option value="">-</option>${[...D.Shows].sort((a,b)=>a.date.localeCompare(b.date)).map(s=>`<option value="${esc(s.id)}"${s.id===val?" selected":""}>${esc(s.id)} · ${fShort(s.date)} · ${esc(s.name)}</option>`).join("")}</select></div>`;
   if(type.startsWith("sel:")) return `<div class="${cls}"><label for="${id}">${label}</label><select id="${id}" name="${k}">${type.slice(4).split(",").map(o=>`<option value="${o}"${o===val?" selected":""}>${k==="cat"?CATLAB[o]+" ("+o+")":o}</option>`).join("")}</select></div>`;
-  if(type==="who"){const sid=$("#f_showId")?.value||FORM_SHOW;const shw=D.Shows.find(s=>s.id===sid);const pool=shw?crewFor([shw]).list:realCrew();const toks=["ทุกคน","Artist","Band","Crew","Management",...pool.map(c=>c.short||c.name)];
+  if(type==="who"){const sid=$("#f_showId")?.value||FORM_SHOW;const shw=D.Shows.find(s=>s.id===sid);const pool=shw?crewFor([shw]).list:realCrew();const toks=["ทุกคน",...parseGroups(shw?.tgroups).map(g=>g.name),"Artist","Band","Crew","Management",...pool.map(c=>c.short||c.name)];
     const cur=(val||"").split(",").map(s=>s.trim()).filter(Boolean);
     return `<div class="${cls}"><label for="${id}">${label}</label><input id="${id}" name="${k}" value="${esc(val)}" placeholder="ทุกคน" autocomplete="off"><div class="tok" data-for="${id}">${[...new Set(toks)].map(t=>`<button type="button" class="${cur.includes(t)?"on":""}" data-tok="${esc(t)}">${esc(t)}</button>`).join("")}</div></div>`}
   if(type==="crew"){const cur=(val||"").split(",").map(s=>s.trim()).filter(Boolean);
@@ -643,6 +748,15 @@ function validate(tab,v){
   if(tab==="Hotels"){if(!v.name)throw new Error("ใส่ชื่อโรงแรมก่อน");if(!okDate(v.checkin)||!okDate(v.checkout))throw new Error("ใส่วันเช็กอินและเช็กเอาต์")}
   if(tab==="Schedule"&&!v.who)v.who="ทุกคน";
   if(tab==="Crew"){if(!v.name)throw new Error("ใส่ชื่อก่อน");if(!v.short)v.short=v.name}
+}
+function editTeams(o){
+  const gs=parseGroups(o.tgroups);const names=[gs[0]?.name||"ทีมรถตู้",gs[1]?.name||"ทีมบิน",gs[2]?.name||""];
+  const fields=[],values={showId:o.id};
+  [0,1,2].forEach(i=>{fields.push([`gn${i}`,i<2?`ชื่อทีม ${i+1}`:"ชื่อทีม 3 (ถ้ามี)","text"],[`gm${i}`,"สมาชิก (กดชื่อเพื่อเลือก / พิมพ์ชื่อคนนอกเพิ่มได้)","crew"]);values[`gn${i}`]=names[i];values[`gm${i}`]=(gs[i]?.members||[]).join(", ")});
+  openForm({title:"ทีมเดินทาง · "+o.name,fields,values,onSave:async v=>{
+    const parts=[0,1,2].map(i=>{const n=(v[`gn${i}`]||"").replace(/[:|]/g," ").trim();const m=(v[`gm${i}`]||"").split(",").map(x=>x.trim()).filter(Boolean);return n&&m.length?`${n}: ${m.join(", ")}`:""}).filter(Boolean);
+    const full={};KEYS.Shows.forEach(k=>full[k]=o[k]);full.tgroups=parts.join(" | ");validate("Shows",full);
+    applyServer(await post({pin:store.get("coban-pin"),action:"update",tab:"Shows",row:o._row,old:o._old,values:KEYS.Shows.map(k=>full[k])}));GSEL=null}});
 }
 function editRecord(tab,o,only){
   const fl=only?FIELDS[tab].filter(f=>only.includes(f[0])):FIELDS[tab];
@@ -879,6 +993,13 @@ function maybeInstallBanner(){
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;maybeInstallBanner()});
 $("#installBtn").onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;$("#install").classList.remove("show")};
 $("#installX").onclick=()=>{store.set("coban-install-x","1");$("#install").classList.remove("show")};
+/* ชื่อไฟล์ PDF = ชื่องาน */
+let BASE_TITLE=document.title;
+function printTitle(){if(VIEW!=="days"||!DAY)return BASE_TITLE;const sh=showsOn(DAY);
+  const name=sh.length?sh.map(x=>x.name+(x.venue?" ("+x.venue+")":"")).join(" + "):"Day sheet";
+  return `COBAN ${DAY} ${name}`.replace(/[\/:*?"<>|]+/g," ").replace(/\s+/g," ").trim()}
+window.addEventListener("beforeprint",()=>{BASE_TITLE=document.title.startsWith("COBAN 20")?BASE_TITLE:document.title;document.title=printTitle()});
+window.addEventListener("afterprint",()=>{document.title=BASE_TITLE});
 if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 
 /* ===== render + events ===== */
@@ -892,9 +1013,11 @@ function render(){
   $("#n-days").textContent=days.length;$("#n-flights").textContent=D.Travel.length;$("#n-hotels").textContent=D.Hotels.length;$("#n-venues").textContent=D.Shows.length;
 }
 document.addEventListener("click",e=>{
+  const te=e.target.closest("[data-teamedit]");if(te){e.stopPropagation();editTeams(D.Shows[+te.dataset.teamedit]);return}
   const cp=e.target.closest("[data-crewpick]");if(cp){e.stopPropagation();editRecord("Shows",D.Shows[+cp.dataset.crewpick],["crew"]);return}
   const ed=e.target.closest("[data-edit]");if(ed){e.stopPropagation();editRecord(ed.dataset.edit,D[ed.dataset.edit][+ed.dataset.i]);return}
   const ad=e.target.closest("[data-add]");if(ad){e.stopPropagation();addRecord(ad.dataset.add,JSON.parse(ad.dataset.preset||"{}"));return}
+  const tgb=e.target.closest("[data-tg]");if(tgb){GSEL=tgb.dataset.tg;render();return}
   const tk=e.target.closest("[data-tick]");if(tk){e.preventDefault();tk.blur();const [a,b]=tk.dataset.tick.split("|");tickGear(a,b);return}
   const gp=e.target.closest("[data-gphase]");if(gp){GPHASE=gp.dataset.gphase;refreshGear();return}
   const gc=e.target.closest("[data-gcat]");if(gc){const k=gc.dataset.gcat;GOPEN.has(k)?GOPEN.delete(k):GOPEN.add(k);refreshGear();return}
@@ -911,7 +1034,7 @@ document.addEventListener("visibilitychange",async()=>{if(document.visibilitySta
 (async()=>{await load();
   const sel=$("#who");sel.innerHTML=`<option value="">ทุกคน</option>`+D.Crew.filter(c=>!/^\(ใส่ชื่อ\)/.test(c.name)).map(c=>`<option value="${esc(c.name)}">${esc(c.short||c.name)} · ${esc(c.role)}</option>`).join("");
   const sv=store.get("coban-who");if(sv&&[...sel.options].some(o=>o.value===sv))sel.value=sv;
-  sel.onchange=()=>{store.set("coban-who",sel.value);render()};
+  sel.onchange=()=>{store.set("coban-who",sel.value);GSEL=null;render()};
   render();setTimeout(maybeInstallBanner,1500)})();
 
 </script>
