@@ -17,7 +17,7 @@
 /* Layout: dark stage bar with a sunset glow (The Coban logo), day sidebar | info column | schedule column; phone stacks.
    Theme: warm paper body, stage-black ink, sunset orange accent for shows. */
 :root{
-  --paper:#f4efe9; --panel:#faf6f1; --card:#ffffff; --line:#e8dfd5; --ink:#1c1410; --sun:#f0641e; --sun2:#c8321a; --sunsoft:#fde3d2; --muted:#7a756d; --grey:#ebe8e1; --r:16px; --shadow:0 1px 2px rgba(34,32,29,.05),0 4px 14px rgba(34,32,29,.05);
+  --paper:#f4efe9; --panel:#faf6f1; --card:#ffffff; --line:#e8dfd5; --ink:#1c1410; --sun:#c0392b; --sun2:#7a1a14; --sunsoft:#f6dcd8; --muted:#7a756d; --grey:#ebe8e1; --r:16px; --shadow:0 1px 2px rgba(34,32,29,.05),0 4px 14px rgba(34,32,29,.05);
   --brown:#0d0d0d; --brown-2:#0d0d0d; --brown-soft:#e2ded6;
   --font-display:"Anuphan","Bricolage Grotesque",system-ui,sans-serif;
   --font-body:"Anuphan",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -32,11 +32,13 @@ button,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid #8a857c;outline-offset:2px}
 .mono{font-family:var(--font-body);font-weight:500;font-variant-numeric:tabular-nums}
 
-.tourbar{position:relative;overflow:hidden;background:radial-gradient(120% 140% at 88% -10%,#ff8a3d 0%,#e0481c 18%,#7a1d0e 40%,#1d0d08 66%,#120c0a 100%);color:#fff;padding:16px 20px 12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.tourbar{position:relative;overflow:hidden;background:radial-gradient(70% 160% at 92% -20%,#f07a2e 0%,#b8361a 20%,#4a140b 45%,#160d0a 70%,#100b09 100%);color:#fff;padding:16px 20px 12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .tourbar::before{content:"";position:absolute;left:0;right:0;bottom:0;height:38%;background:linear-gradient(180deg,transparent,rgba(18,12,10,.55));pointer-events:none}
 .tourbar>*{position:relative}
-.logo{width:60px;height:60px;border-radius:14px;object-fit:cover;flex:none;box-shadow:0 0 0 3px rgba(255,170,110,.35),0 0 24px rgba(255,110,40,.45)}
-.tourbar h1{margin:0;font-family:var(--font-display);font-weight:700;font-size:32px;letter-spacing:.04em;line-height:1}
+.logo{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 3px rgba(255,170,110,.35),0 0 24px rgba(255,110,40,.45)}
+.tourbar h1{margin:2px 0 0;line-height:0}
+.wordmark{height:88px;width:auto;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .tourbar .kick{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.9;margin-bottom:4px}
 .tourbar .meta{font-size:12px;opacity:.75;margin-top:4px}
 .drip{position:absolute;right:-20px;top:-26px;width:300px;opacity:.55;mix-blend-mode:screen;pointer-events:none;z-index:0}
@@ -205,7 +207,7 @@ h2.lh{font-family:var(--font-display);font-weight:700;font-size:22px;margin:0 0 
   .dayitem{min-width:150px;margin:0;background:var(--card)}
   .cols{grid-template-columns:1fr}
   main{padding:14px 16px 40px}
-  .tourbar h1{font-size:28px}
+  .wordmark{height:70px}
   .drip{width:200px;top:-18px}
   .tourbar .who{margin-left:0;width:100%}
   .lrow{grid-template-columns:90px 1fr}
@@ -276,7 +278,7 @@ body.editing button.chip{cursor:pointer}body.editing button.chip:hover{border-co
 <body>
 <header class="tourbar">
   <img class="logo" src="icon-512.png" alt="The Coban">
-  <div><div class="kick">Music Production · Day Schedule</div><h1 id="tourTitle">THE COBAN</h1><div class="meta" id="tourMeta"></div></div>
+  <div><div class="kick">Music Production · Day Schedule</div><h1 id="tourTitle"><img class="wordmark" src="logo.png" alt=""><span class="sr">THE COBAN</span></h1><div class="meta" id="tourMeta"></div></div>
   <div class="who"><label for="who">ดูตารางของ</label><select id="who"></select><button class="hbtn" type="button" id="editToggle">✎ แก้ไข</button></div>
 </header>
 <div class="editbar" id="editbar"><span>โหมดแก้ไข · กดปุ่ม ✎ ที่แต่ละรายการ หรือ + เพื่อเพิ่ม</span><span class="spacer" style="flex:1"></span><button class="hbtn on" type="button" id="pasteBtn">📋 วางข้อความจาก LINE</button><button class="hbtn" type="button" id="reloadBtn">รีเฟรชข้อมูล</button><button class="hbtn" type="button" id="lockBtn">ออกจากโหมดแก้ไข</button></div>
@@ -541,7 +543,7 @@ function renderDay(s){
         <div class="side-col"><span class="tag">${esc(CATLAB[r.cat]||r.cat||"อื่นๆ")}</span>${edBtn("Schedule",r)}</div></div>`;
       if(ok&&m!=null)prev={m:mins(r.end)??m}});
   }
-  L+=`</section>${gearBox(sh)}</div><div class="foot">${esc(SOURCE)} · v1</div>`;
+  L+=`</section>${gearBox(sh)}</div><div class="foot">${esc(SOURCE)} · v2</div>`;
   $("#app").innerHTML=L;
   $("#copyBtn").onclick=()=>copyDay(s,sh,items);
   $("#printBtn").onclick=()=>{try{window.print()}catch(e){}};
